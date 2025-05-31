@@ -1,3 +1,4 @@
+import 'package:batik_app/screens/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:batik_app/utils/notification_service.dart';
@@ -13,11 +14,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Batik App',
-      home: Scaffold(
-        appBar: AppBar(title: Text('Batik App')),
-        body: Center(child: Text('Hello World')),
-      ),
+      initialRoute: 'home',
+      routes: {
+        // 'login': (context) => LoginPage(),
+        // 'register': (context) => RegisterPage(),
+        // 'profile': (context) => ProfilePage(),
+        'home': (context) => HomePage(),
+        // 'post/create': (context) => CreatePostPage(),
+      },
     );
   }
 }

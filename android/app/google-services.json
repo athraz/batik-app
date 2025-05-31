@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "2449386254",
+    "project_id": "batik-app-d1c77",
+    "storage_bucket": "batik-app-d1c77.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:2449386254:android:b5cfa863ceba45219d855f",
+        "android_client_info": {
+          "package_name": "com.example.batik_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcuKe6XW43Lj8PoiqVY3KTv6ft4VWSrXE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
