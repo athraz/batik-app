@@ -17,6 +17,7 @@ class PostCard extends StatefulWidget {
 
 class _PostCardState extends State<PostCard> {
   int _currentPage = 0;
+  final Map<int, bool> _expandedStates = {};
 
   String timeAgo(DateTime date) {
     final now = DateTime.now();
@@ -45,6 +46,8 @@ class _PostCardState extends State<PostCard> {
     // TODO: get the real username
     final username = post.userId;
     final images = post.images ?? [];
+
+    final currentCaption = post.caption;
 
     return Card(
       elevation: 0,
@@ -136,42 +139,44 @@ class _PostCardState extends State<PostCard> {
                       ),
 
                       // Current page / total on top right corner
-                      Positioned(
-                        top: 8,
-                        right: 8,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.black54,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            '${_currentPage + 1}/${images.length}',
-                            style: const TextStyle(color: Colors.white, fontSize: 12),
+                      if (images.length > 1) ...[
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.black54,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              '${_currentPage + 1}/${images.length}',
+                              style: const TextStyle(color: Colors.white, fontSize: 12),
+                            ),
                           ),
                         ),
-                      ),
 
-                      // Bottom center dots indicator
-                      Positioned(
-                        bottom: 8,
-                        left: 0,
-                        right: 0,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(images.length, (index) {
-                            return Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 3),
-                              width: _currentPage == index ? 10 : 6,
-                              height: _currentPage == index ? 10 : 6,
-                              decoration: BoxDecoration(
-                                color: _currentPage == index ? Colors.white : Colors.white54,
-                                shape: BoxShape.circle,
-                              ),
-                            );
-                          }),
+                        // Bottom center dots indicator
+                        Positioned(
+                          bottom: 8,
+                          left: 0,
+                          right: 0,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(images.length, (index) {
+                              return Container(
+                                margin: const EdgeInsets.symmetric(horizontal: 3),
+                                width: _currentPage == index ? 10 : 6,
+                                height: _currentPage == index ? 10 : 6,
+                                decoration: BoxDecoration(
+                                  color: _currentPage == index ? Colors.white : Colors.white54,
+                                  shape: BoxShape.circle,
+                                ),
+                              );
+                            }),
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   )
                 : Container(
@@ -194,26 +199,67 @@ class _PostCardState extends State<PostCard> {
 
           // Username + Caption
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            child: RichText(
-              text: TextSpan(
-                style: DefaultTextStyle.of(context).style,
-                children: [
-                  TextSpan(
-                    text: '$username ',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  TextSpan(
-                    text: post.caption,
-                  ),
-                ],
-              ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final maxWidth = constraints.maxWidth;
+
+                // Prepare TextPainter to measure the caption length
+                final TextSpan textSpan = TextSpan(
+                  style: DefaultTextStyle.of(context).style,
+                  children: [
+                    TextSpan(
+                      text: '$username ',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    TextSpan(text: currentCaption),
+                  ],
+                );
+
+                final TextPainter textPainter = TextPainter(
+                  text: textSpan,
+                  maxLines: 1,
+                  textDirection: TextDirection.ltr,
+                );
+
+                textPainter.layout(maxWidth: maxWidth);
+
+                final isOverflow = textPainter.didExceedMaxLines;
+
+                final isExpanded = _expandedStates[_currentPage] ?? false;
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    RichText(
+                      maxLines: isExpanded ? null : 1,
+                      overflow: isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
+                      text: textSpan,
+                    ),
+                    if (isOverflow)
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _expandedStates[_currentPage] = !isExpanded;
+                          });
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Text(
+                            isExpanded ? 'less' : 'more',
+                            style: const TextStyle(color: Colors.grey),
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              },
             ),
           ),
 
           // Timestamp
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Text(
               post.createdAt != null ? timeAgo(post.createdAt!) : '',
               style: TextStyle(color: Colors.grey[600], fontSize: 12),
