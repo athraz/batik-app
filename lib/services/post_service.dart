@@ -18,7 +18,10 @@ class PostService {
         throw Exception('Cannot check image type at index $i');
       }
 
-      String? imageUrl = await ImageService().uploadImage(imageFile);
+      // TODO: get real userid
+      String userId = "dummyUserId";
+
+      String? imageUrl = await ImageService().uploadImage(imageFile, userId);
       if (imageUrl == null || imageUrl.isEmpty) {
         throw Exception('Failed to upload image at index $i');
       }
