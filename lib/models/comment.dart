@@ -3,11 +3,13 @@ class Comment {
   final String content;
   final String authorId;
   final String postId;
+  final DateTime? createdAt;
 
   Comment({
     this.id,
     required this.content,
     required this.authorId,
     required this.postId,
+    this.createdAt,
   });
 }

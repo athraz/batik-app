@@ -75,6 +75,8 @@ class _HomePageState extends State<HomePage> with RouteAware {
               return PostCard(
                 post: post,
                 index: index.toString(),
+                currentUserId:
+                    post.userId, // Replace with actual current user ID
               );
             },
           );
@@ -90,9 +92,18 @@ class _HomePageState extends State<HomePage> with RouteAware {
         showSelectedLabels: false,
         showUnselectedLabels: false,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home, size: 32), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.add_circle_outline, size: 32), label: 'Add'),
-          BottomNavigationBarItem(icon: Icon(Icons.account_circle, size: 32), label: 'Profile'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home, size: 32),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_circle_outline, size: 32),
+            label: 'Add',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle, size: 32),
+            label: 'Profile',
+          ),
         ],
       ),
     );

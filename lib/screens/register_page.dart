@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -11,6 +12,7 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _usernameController = TextEditingController();
 
   bool _isLoading = false;
   String _errorCode = "";
@@ -32,10 +34,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
+      final userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: _emailController.text,
+            password: _passwordController.text,
+          );
+      // Create a new user document in Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user?.uid)
+          .set({
+            'username': _usernameController.text,
+            'email': _emailController.text,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+
+      // Update the user's display name with the username
+      await userCredential.user?.updateDisplayName(_usernameController.text);
+
       navigateLogin();
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -63,6 +79,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
               TextField(
                 controller: _emailController,
                 decoration: const InputDecoration(label: Text('Email')),
+              ),
+              TextField(
+                controller: _usernameController,
+                decoration: const InputDecoration(label: Text('Username')),
               ),
               TextField(
                 controller: _passwordController,
